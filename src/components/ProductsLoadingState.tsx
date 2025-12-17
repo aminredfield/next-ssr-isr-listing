@@ -7,7 +7,7 @@ import CardContent from '@mui/material/CardContent';
 /**
  * ProductSkeleton - скелетон для карточки товара во время загрузки.
  */
-function ProductSkeleton() {
+export function ProductSkeleton() {
     return (
         <Card>
             <Skeleton variant="rectangular" height={240} />
