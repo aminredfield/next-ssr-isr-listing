@@ -3,3 +3,5 @@ export * from './ProductGrid';
 export * from './EmptyState';
 export * from './ProductsLoadingState';
 export * from './ThemeRegistry';
+export * from './Header';
+export * from './AddToCartButton';

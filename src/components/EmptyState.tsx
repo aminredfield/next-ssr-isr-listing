@@ -7,7 +7,7 @@ import InventoryIcon from '@mui/icons-material/Inventory';
  * EmptyState - компонент для отображения пустого состояния,
  * когда товары не найдены.
  */
-export function EmptyState() {
+export function EmptyState({ message }: { message?: string }) {
   return (
     <Box
       sx={{
@@ -36,27 +36,31 @@ export function EmptyState() {
         />
 
         <Typography variant="h5" component="h2" gutterBottom sx={{ fontWeight: 600 }}>
-          No Products Found
+          {message || 'No Products Found'}
         </Typography>
 
-        <Typography variant="body1" color="text.secondary" paragraph>
-          There are currently no products available in the catalogue.
-        </Typography>
+        {!message && (
+          <>
+            <Typography variant="body1" color="text.secondary" paragraph>
+              There are currently no products available in the catalogue.
+            </Typography>
 
-        <Typography
-          variant="body2"
-          color="text.secondary"
-          sx={{
-            mt: 3,
-            p: 2,
-            backgroundColor: 'background.paper',
-            borderRadius: 1,
-            fontFamily: 'monospace',
-            fontSize: '0.875rem'
-          }}
-        >
-          Try editing <strong>src/data/products.ts</strong> to add some products
-        </Typography>
+            <Typography
+              variant="body2"
+              color="text.secondary"
+              sx={{
+                mt: 3,
+                p: 2,
+                backgroundColor: 'background.paper',
+                borderRadius: 1,
+                fontFamily: 'monospace',
+                fontSize: '0.875rem'
+              }}
+            >
+              Try editing <strong>src/data/products.ts</strong> to add some products
+            </Typography>
+          </>
+        )}
       </Paper>
     </Box>
   );

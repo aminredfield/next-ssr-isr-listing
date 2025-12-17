@@ -11,6 +11,7 @@ import Divider from '@mui/material/Divider';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import StarIcon from '@mui/icons-material/Star';
 import { fetchProductById } from '../../../src/lib/products';
+import { AddToCartButton } from '../../../src/components/AddToCartButton';
 
 interface Params {
   id: string;
@@ -133,14 +134,7 @@ export default async function ProductDetailPage({ params }: { params: Params }) 
             </Box>
 
             <Box sx={{ mt: 4 }}>
-              <Button
-                variant="contained"
-                size="large"
-                fullWidth
-                sx={{ py: 1.5, fontSize: '1.125rem' }}
-              >
-                Add to Cart
-              </Button>
+              <AddToCartButton product={product} />
             </Box>
           </Box>
         </Box>

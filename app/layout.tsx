@@ -1,10 +1,9 @@
 import type { ReactNode } from 'react';
-import AppBar from '@mui/material/AppBar';
-import Toolbar from '@mui/material/Toolbar';
-import Typography from '@mui/material/Typography';
+import { ThemeRegistry } from '../src/components/ThemeRegistry';
+import { Header } from '../src/components/Header';
 import Container from '@mui/material/Container';
 import Box from '@mui/material/Box';
-import { ThemeRegistry } from '../src/components';
+import Typography from '@mui/material/Typography';
 
 export const metadata = {
   title: {
@@ -16,19 +15,12 @@ export const metadata = {
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
-  
   return (
     <html lang="en">
       <body style={{ margin: 0 }}>
         <ThemeRegistry>
           <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-            <AppBar position="sticky" color="primary" elevation={1}>
-              <Toolbar>
-                <Typography variant="h6" component="div" sx={{ flexGrow: 1, fontWeight: 600 }}>
-                  Product Catalogue
-                </Typography>
-              </Toolbar>
-            </AppBar>
+            <Header />
 
             <Container
               component="main"
@@ -49,7 +41,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                 py: 3,
                 px: 2,
                 mt: 'auto',
-                backgroundColor:"grey.100"
+                backgroundColor: "grey.100"
               }}
             >
               <Container maxWidth="xl">
