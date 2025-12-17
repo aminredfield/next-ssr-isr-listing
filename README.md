@@ -4,7 +4,7 @@
 
 **Цель проекта** — продемонстрировать навыки проектирования архитектуры, работы с рендерингом, UI/UX и управления состоянием в реальных условиях.
 
-**Демо**: [https://next-ssr-isr-listing.netlify.app](https://next-ssr-isr-listing.netlify.app)
+**Демо**: [https://react-url-synced-filters.netlify.app](https://react-url-synced-filters.netlify.app/)
 
 ---
 
