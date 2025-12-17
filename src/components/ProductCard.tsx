@@ -1,34 +1,84 @@
 import Image from 'next/image';
 import Link from 'next/link';
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import CardMedia from '@mui/material/CardMedia';
+import Typography from '@mui/material/Typography';
+import Button from '@mui/material/Button';
+import Box from '@mui/material/Box';
+import Chip from '@mui/material/Chip';
+import StarIcon from '@mui/icons-material/Star';
 import type { Product } from '../types/product';
 
 /**
- * Displays a single product. Shows an image, title, price, optional
- * rating and a link to the product details page. Uses next/image for
- * optimised loading and next/link for client‑side navigation.
+ * ProductCard - карточка товара с использованием Material UI.
+ * Отображает изображение, название, цену, рейтинг и кнопку перехода к деталям.
  */
 export function ProductCard({ product }: { product: Product }) {
   return (
-    <div className="border rounded-lg shadow-sm p-4 bg-white flex flex-col">
-      <div className="relative w-full h-48 mb-4">
+    <Card
+      sx={{
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+      }}
+    >
+      <Box sx={{ position: 'relative', width: '100%', height: 240, bgcolor: 'grey.50' }}>
         <Image
           src={product.image}
           alt={product.title}
           fill
-          className="object-contain"
+          style={{ objectFit: 'contain', padding: '16px' }}
         />
-      </div>
-      <h3 className="text-lg font-semibold mb-1">{product.title}</h3>
-      <p className="text-gray-600 mb-1">Price: ${product.price.toFixed(2)}</p>
-      {product.rating != null && (
-        <p className="text-gray-600 mb-2">Rating: {product.rating}</p>
-      )}
-      <Link
-        href={`/products/${product.id}`}
-        className="mt-auto inline-block text-blue-600 hover:underline"
-      >
-        Open
-      </Link>
-    </div>
+      </Box>
+
+      <CardContent sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', gap: 1 }}>
+        <Typography
+          variant="h6"
+          component="h3"
+          sx={{
+            fontWeight: 600,
+            minHeight: '3rem',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            display: '-webkit-box',
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: 'vertical',
+          }}
+        >
+          {product.title}
+        </Typography>
+
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 'auto' }}>
+          <Typography
+            variant="h5"
+            color="primary.main"
+            sx={{ fontWeight: 700 }}
+          >
+            ${product.price.toFixed(2)}
+          </Typography>
+
+          {product.rating != null && (
+            <Chip
+              icon={<StarIcon sx={{ fontSize: '1rem' }} />}
+              label={product.rating.toFixed(1)}
+              size="small"
+              color="warning"
+              sx={{ ml: 'auto' }}
+            />
+          )}
+        </Box>
+
+        <Button
+          component={Link}
+          href={`/products/${product.id}`}
+          variant="contained"
+          fullWidth
+          sx={{ mt: 2 }}
+        >
+          View Details
+        </Button>
+      </CardContent>
+    </Card>
   );
 }

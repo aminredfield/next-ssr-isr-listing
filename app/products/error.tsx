@@ -1,11 +1,17 @@
 'use client';
 
 import { useEffect } from 'react';
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
+import Button from '@mui/material/Button';
+import Paper from '@mui/material/Paper';
+import Alert from '@mui/material/Alert';
+import AlertTitle from '@mui/material/AlertTitle';
+import RefreshIcon from '@mui/icons-material/Refresh';
 
 /**
- * Error boundary UI for the products listing. When an error is thrown
- * during rendering or data fetching, this component is rendered by
- * Next.js. The `reset` function allows users to retry the operation.
+ * Error boundary для страницы products.
+ * Отображает дружелюбное сообщение об ошибке с возможностью повторить запрос.
  */
 export default function Error({
   error,
@@ -15,21 +21,46 @@ export default function Error({
   reset: () => void;
 }) {
   useEffect(() => {
-    // Log the error so developers can inspect it in the console.
-    // eslint-disable-next-line no-console
-    console.error(error);
+    console.error('Products page error:', error);
   }, [error]);
 
   return (
-    <div className="p-4 text-center">
-      <h2 className="text-lg font-semibold mb-2">Something went wrong!</h2>
-      <p className="text-gray-600 mb-4">{error.message}</p>
-      <button
-        onClick={() => reset()}
-        className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+    <Box
+      sx={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        minHeight: '50vh',
+      }}
+    >
+      <Paper
+        elevation={0}
+        sx={{
+          p: 4,
+          maxWidth: 600,
+          width: '100%',
+        }}
       >
-        Try again
-      </button>
-    </div>
+        <Alert severity="error" sx={{ mb: 3 }}>
+          <AlertTitle sx={{ fontWeight: 600 }}>Something went wrong</AlertTitle>
+          {error.message || 'An unexpected error occurred while loading products'}
+        </Alert>
+
+        <Typography variant="body2" color="text.secondary" paragraph>
+          We encountered an error while fetching the products. This could be due to a
+          temporary issue with the data source.
+        </Typography>
+
+        <Button
+          variant="contained"
+          startIcon={<RefreshIcon />}
+          onClick={reset}
+          fullWidth
+          sx={{ mt: 2 }}
+        >
+          Try Again
+        </Button>
+      </Paper>
+    </Box>
   );
 }

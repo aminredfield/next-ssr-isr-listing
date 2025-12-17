@@ -1,17 +1,19 @@
+import Grid from '@mui/material/Grid';
 import { Product } from '../types/product';
-import { ProductCard } from './ProductCard.tsx';
+import { ProductCard } from './ProductCard';
 
 /**
- * Renders a responsive grid of products. Adjusts the number of columns
- * based on screen size using Tailwind CSS grid utilities. Each product
- * card manages its own layout.
+ * ProductGrid - адаптивная сетка товаров с использованием MUI Grid.
+ * Автоматически подстраивается под разные размеры экранов.
  */
 export function ProductGrid({ products }: { products: Product[] }) {
   return (
-    <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 p-4">
+    <Grid container spacing={3}>
       {products.map((product) => (
-        <ProductCard key={product.id} product={product} />
+        <Grid item key={product.id} xs={12} sm={6} md={4} lg={3}>
+          <ProductCard product={product} />
+        </Grid>
       ))}
-    </div>
+    </Grid>
   );
 }

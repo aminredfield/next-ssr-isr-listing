@@ -21,7 +21,7 @@ export const products: RawProduct[] = [
     price: 99.99,
     rating: 4.5,
     image:
-      'https://images.unsplash.com/photo-1585386959984-a41552265b40?auto=format&fit=crop&w=800&q=60',
+      'https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?auto=format&fit=crop&w=800&q=60',
   },
   {
     id: '2',
@@ -37,7 +37,7 @@ export const products: RawProduct[] = [
     price: 49.5,
     rating: 4.2,
     image:
-      'https://images.unsplash.com/photo-1581262519556-3ed67a8196b1?auto=format&fit=crop&w=800&q=60',
+      'https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?auto=format&fit=crop&w=800&q=60',
   },
   {
     id: '4',
@@ -45,7 +45,7 @@ export const products: RawProduct[] = [
     price: 39.99,
     rating: 4.6,
     image:
-      'https://images.unsplash.com/photo-1587334209643-795266f617f9?auto=format&fit=crop&w=800&q=60',
+      'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=800&q=60',
   },
   {
     id: '5',
