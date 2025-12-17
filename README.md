@@ -4,7 +4,7 @@
 
 Проект не является коммерческим продуктом и не претендует на полнофункциональный интернет-магазин. Его цель — показать, **как я проектирую архитектуру, рендеринг, UI и работу с состоянием** в реальных проектах.
 
-[Демо: https://next-ssr-isr-listing.netlify.app](https://next-ssr-isr-listing.netlify.app)
+Демо: [https://next-ssr-isr-listing.netlify.app](https://next-ssr-isr-listing.netlify.app)
 ---
 
 ## Цель проекта
