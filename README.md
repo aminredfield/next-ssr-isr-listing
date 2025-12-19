@@ -1,131 +1,201 @@
-# next-ssr-isr-listing
+# Product Catalogue — Next.js 14 + Material UI
 
-A small demo application built with **Next.js** (App Router) that showcases server‑side rendering (SSR), incremental static regeneration (ISR), basic SEO metadata and friendly page states (loading, error and empty) for a list of products.  The goal of this project is to provide a clean, well‑structured example of how to build a data‑driven page in Next.js using good practices, TypeScript and a minimal design.
+Демонстрационный **pet-проект** для портфолио, показывающий мой подход к разработке современных веб-приложений на стеке **Next.js 14**, **React**, **TypeScript** и **Material UI**.
 
-> **Note on versions**
->
-> This project uses Next.js&nbsp;14 (version&nbsp;`14.2.35`) because it is the latest stable release recommended by the Next.js team as of December&nbsp;2025【354917004412805†L94-L100】.  Using a patched 14.2.x version avoids recent vulnerabilities disclosed in React Server Components and the App Router.
+**Цель проекта** — продемонстрировать навыки проектирования архитектуры, работы с рендерингом, UI/UX и управления состоянием в реальных условиях.
 
-## Goal
+**Демо**: [next-ssr-isr-listing.netlify.app](https://next-ssr-isr-listing.netlify.app)
 
-* Demonstrate SSR and ISR on a `/products` listing page.
-* Provide SEO metadata and a canonical URL.
-* Display proper loading, error and empty states without client‑side JavaScript.
-* Use a local mock API so data can be edited easily to observe ISR in action.
+---
 
-## Stack
+## 🎯 Что демонстрирует проект
 
-* [Next.js App Router](https://nextjs.org/docs) (SSR, ISR)
-* TypeScript throughout the codebase
-* Tailwind CSS for quick and responsive styling
-* Fetch API with a simple data layer and custom error handling
-* Vitest for unit tests
-* ESLint and Prettier for code quality
+### Технические навыки
+- **Next.js 14 App Router** — Server Components, Client Components, SSR, ISR
+- **TypeScript** — строгая типизация, type-safety
+- **Material UI** — кастомная тема, компонентная библиотека, адаптивный дизайн
+- **Архитектура** — чёткое разделение слоёв (UI, бизнес-логика, данные)
+- **State Management** — Context API + localStorage
+- **UX-паттерны** — loading states, error handling, empty states
+- **SEO** — метаданные, canonical URLs, семантическая разметка
 
-## Features
+### Реализованный функционал
 
-* **Server‑side rendering**: The `/products` page renders on the server on first request.  No `"use client"` is used on this page, so the initial HTML contains the product cards without requiring client JavaScript.
-* **Incremental static regeneration (ISR)**: The products listing is cached and automatically re‑rendered in the background every `60` seconds (`revalidate` value).  After the revalidation period, the next request will trigger a rebuild and return updated content.
-* **SEO metadata**: Both the listing and individual product pages specify titles, descriptions and canonical URLs via `generateMetadata` functions.
-* **Page states**: Dedicated components for loading, error and empty states provide good user experience.  Errors thrown by the data layer are caught by Next.js and displayed via a friendly error boundary.
-* **Clean architecture**: Data fetching and normalisation logic lives in `src/lib`.  Types are defined in `src/types`.  UI components are small and reusable.  The API route uses the same data source as the server component.
-* **Unit tests**: A handful of tests exercise the data normalisation logic and error handling.
+**Каталог товаров** (`/products`)
+- Поиск по названию
+- Фильтрация по цене и рейтингу
+- Сортировка (цена, рейтинг, название)
+- Синхронизация фильтров с URL
+- Клиентский рендеринг с мгновенными обновлениями
 
-## Getting Started
+**Страница товара** (`/products/[id]`)
+- Server Component с ISR (revalidate: 60s)
+- Динамическая генерация SEO-метаданных
+- Custom 404 страница
 
-1. **Install dependencies**
+**Корзина и оформление заказа**
+- Глобальное состояние через Context API
+- Персистентность через localStorage
+- Форма с валидацией
+- Страница подтверждения заказа
 
-   ```bash
-   npm install
-   ```
+**UI/UX состояния**
+- Skeleton loaders при загрузке
+- Error boundaries с retry
+- Empty states
+- Toast-уведомления
+- Адаптивный дизайн (mobile-first)
 
-2. **Run in development**
+> **Примечание**: Корзина и checkout реализованы не для полноценного e-commerce, а для демонстрации управления состоянием, композиции компонентов и UX-паттернов.
 
-   ```bash
-   npm run dev
-   ```
+---
 
-   The application will be available at `http://localhost:3000`.  Visit `/products` to see the list.
+## 🛠 Технологический стек
 
-3. **Run the tests**
+- **Next.js 14** — App Router, SSR, ISR
+- **React 18** — Server/Client Components
+- **TypeScript** — строгая типизация
+- **Material UI 5** — компонентная библиотека
+- **Emotion** — CSS-in-JS
+- **ESLint + Prettier** — качество кода
+- **Vitest** — unit-тестирование
 
-   ```bash
-   npm test
-   ```
+---
 
-4. **Lint and format**
+## 📁 Архитектура проекта
 
-   ```bash
-   npm run lint    # check for lint issues
-   npm run format  # automatically format the codebase
-   ```
+Проект организован по принципу **разделения ответственности**:
+```
+app/                      # Next.js App Router (роутинг + рендеринг)
+├── api/                  # API Routes
+├── products/             # Каталог товаров
+│   ├── [id]/            # Страница товара (SSR/ISR)
+│   ├── page.tsx         # Список товаров (Client)
+│   ├── loading.tsx      # Loading state
+│   └── error.tsx        # Error boundary
+├── cart/                # Корзина
+├── checkout/            # Оформление заказа
+└── layout.tsx           # Корневой layout
 
-## How to verify ISR
-
-The products page uses ISR with a `revalidate` interval of **60 seconds**.  To see ISR in action:
-
-1. Start the dev server with `npm run dev` and navigate to `http://localhost:3000/products`.
-2. Open the file `src/data/products.ts` in your editor and modify one of the product titles or add/remove products.  Save the file.
-3. Wait at least `60` seconds.  The page is currently serving the cached version.
-4. Refresh the `/products` page in your browser *after* the revalidation period.  You should see your changes reflected.  This demonstrates that the page was regenerated in the background using ISR.
-
-The `revalidate` setting is defined at the top of `app/products/page.tsx`:
-
-```ts
-// app/products/page.tsx
-export const revalidate = 60;
+src/
+├── components/          # Переиспользуемые UI-компоненты
+├── context/             # Глобальное состояние (Cart)
+├── hooks/               # Custom React hooks
+├── lib/                 # Бизнес-логика и утилиты
+├── data/                # Mock-данные
+├── types/               # TypeScript типы
+└── theme.ts             # MUI тема
 ```
 
-## Project structure
+### Принципы архитектуры
 
-The repository uses a simple and predictable layout:
+- **Разделение на слои**: UI, бизнес-логика, данные
+- **Композиция компонентов**: переиспользуемость и читаемость
+- **Type-safety**: строгая типизация на всех уровнях
+- **Минимум магии**: явный и понятный код
+- **Готовность к масштабированию**: легко добавлять новые фичи
 
-```
-next-ssr-isr-listing/
-├── app/
-│   ├── layout.tsx             # root layout with global styles
-│   ├── page.tsx               # home page, links to /products
-│   └── products/
-│       ├── page.tsx           # server component with SSR & ISR
-│       ├── loading.tsx        # loading state placeholder
-│       ├── error.tsx          # error boundary UI
-│       └── [id]/
-│           ├── page.tsx       # product detail page (optional)
-│           └── not-found.tsx  # custom 404 for missing products
-├── src/
-│   ├── data/
-│   │   └── products.ts        # mock product data (edit to test ISR)
-│   ├── lib/
-│   │   └── products.ts        # data fetching & normalisation logic
-│   ├── types/
-│   │   └── product.ts         # TypeScript interfaces
-│   └── components/
-│       ├── ProductCard.tsx    # product card UI
-│       ├── ProductGrid.tsx    # responsive grid layout
-│       └── EmptyState.tsx     # shown when no products
-├── tests/
-│   └── products.test.ts       # unit tests for data layer
-├── tailwind.config.js         # Tailwind CSS configuration
-├── postcss.config.js          # PostCSS configuration
-├── tsconfig.json              # TypeScript configuration
-├── .eslintrc.cjs              # ESLint configuration
-├── .prettierrc.json           # Prettier configuration
-├── vitest.config.ts           # Vitest configuration
-├── next.config.mjs            # Next.js configuration
-└── README.md                  # project documentation (this file)
+---
+
+## 🚀 Запуск проекта
+
+### Установка зависимостей
+```bash
+npm install
 ```
 
-## Scripts
+### Режим разработки
+```bash
+npm run dev
+```
+Приложение откроется на `http://localhost:3000`
 
-| Script          | Description                                           |
-|-----------------|-------------------------------------------------------|
-| `npm run dev`   | Start the development server on `localhost:3000`.     |
-| `npm run build` | Build the application for production.                 |
-| `npm run start` | Start the production build (`next start`).           |
-| `npm run lint`  | Run ESLint to check for problems.                    |
-| `npm run format`| Format all files using Prettier.                     |
-| `npm run test`  | Run unit tests with Vitest.                          |
+### Production сборка
+```bash
+npm run build
+npm start
+```
 
-## Environment variables
+---
 
-There are no required environment variables for this project.  An example `.env.example` file is provided for illustration.  You can use it as a template if you decide to add variables later.
+## 📝 Доступные скрипты
+
+| Команда              | Описание                    |
+|---------------------|-----------------------------|
+| `npm run dev`       | Запуск dev-сервера          |
+| `npm run build`     | Production сборка           |
+| `npm run start`     | Запуск production сборки    |
+| `npm run lint`      | Проверка кода (ESLint)      |
+| `npm run format`    | Форматирование (Prettier)   |
+| `npm test`          | Запуск тестов (Vitest)      |
+
+---
+
+## 🎨 UI/UX особенности
+
+- **Единая дизайн-система** через MUI тему
+- **Адаптивный дизайн** (xs/sm/md/lg/xl breakpoints)
+- **Состояния интерфейса**:
+  - Loading (skeleton loaders)
+  - Error (с возможностью retry)
+  - Empty (понятные заглушки)
+  - Success (toast-уведомления)
+- **Доступность**: семантическая разметка, ARIA-атрибуты
+- **Производительность**: оптимизация изображений, code splitting
+
+---
+
+## 🔍 Технические детали
+
+### Server vs Client Components
+- **Server Components**: страницы товаров с ISR
+- **Client Components**: интерактивные элементы (фильтры, корзина, формы)
+
+### ISR (Incremental Static Regeneration)
+```typescript
+export const revalidate = 60; // Ревалидация каждые 60 секунд
+```
+
+### SEO
+- Динамическая генерация метаданных
+- Canonical URLs
+- Structured data ready
+
+### State Management
+- **Global state**: Context API (корзина)
+- **Local state**: React hooks (формы, UI)
+- **Persistent state**: localStorage (корзина)
+
+---
+
+## 📚 Что я хотел показать этим проектом
+
+1. **Понимание Next.js 14** — грамотное использование App Router, SSR, ISR
+2. **Архитектурное мышление** — чистая структура, разделение ответственности
+3. **TypeScript** — строгая типизация без компромиссов
+4. **Material UI** — кастомизация, консистентный дизайн
+5. **UX-подход** — внимание к деталям, состояния загрузки и ошибок
+6. **Качество кода** — читаемость, поддерживаемость, масштабируемость
+7. **Best practices** — ESLint, Prettier, семантическая разметка
+
+---
+
+## 🔮 Возможные улучшения
+
+Проект намеренно оставлен простым для демонстрации основных навыков. Потенциальные улучшения:
+
+- [ ] Интеграция с реальным API
+- [ ] Авторизация и профиль пользователя
+- [ ] История заказов
+- [ ] Wishlist (избранное)
+- [ ] Отзывы и рейтинги
+- [ ] Галерея изображений товара
+- [ ] Интеграция платежных систем
+- [ ] i18n (мультиязычность)
+- [ ] E2E тестирование (Playwright)
+
+---
+
+**Проект создан исключительно в образовательных целях для демонстрации технических навыков.**
+
+**Лицензия**: MIT
