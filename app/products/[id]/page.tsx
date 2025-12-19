@@ -8,8 +8,10 @@ import Button from '@mui/material/Button';
 import Paper from '@mui/material/Paper';
 import Chip from '@mui/material/Chip';
 import Divider from '@mui/material/Divider';
+import Grid from '@mui/material/Grid';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import StarIcon from '@mui/icons-material/Star';
+import LocalShippingIcon from '@mui/icons-material/LocalShipping';
 import { fetchProductById } from '../../../src/lib/products';
 import { AddToCartButton } from '../../../src/components/AddToCartButton';
 
@@ -28,7 +30,7 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
   }
   return {
     title: product.title,
-    description: `View details for ${product.title}`,
+    description: product.description || `View details for ${product.title}`,
     alternates: {
       canonical: `/products/${product.id}`,
     },
@@ -53,37 +55,46 @@ export default async function ProductDetailPage({ params }: { params: Params }) 
         Back to Products
       </Button>
 
-      <Paper elevation={1} sx={{ p: 4 }}>
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: { xs: 'column', md: 'row' },
-            gap: 4,
-          }}
-        >
+      <Paper elevation={1} sx={{ p: { xs: 3, md: 4 } }}>
+        <Grid container spacing={4}>
           {/* Изображение товара */}
-          <Box
-            sx={{
-              position: 'relative',
-              width: { xs: '100%', md: '400px' },
-              height: { xs: '300px', md: '400px' },
-              flexShrink: 0,
-              backgroundColor: 'grey.50',
-              borderRadius: 2,
-              overflow: 'hidden',
-            }}
-          >
-            <Image
-              src={product.image}
-              alt={product.title}
-              fill
-              style={{ objectFit: 'contain', padding: '24px' }}
-              priority
-            />
-          </Box>
+          <Grid item xs={12} md={6}>
+            <Box
+              sx={{
+                position: 'relative',
+                width: '100%',
+                height: { xs: 300, md: 500 },
+                backgroundColor: 'grey.50',
+                borderRadius: 2,
+                overflow: 'hidden',
+              }}
+            >
+              <Image
+                src={product.image}
+                alt={product.title}
+                fill
+                style={{ objectFit: 'contain', padding: '24px' }}
+                priority
+              />
+            </Box>
+          </Grid>
 
           {/* Информация о товаре */}
-          <Box sx={{ flex: 1 }}>
+          <Grid item xs={12} md={6}>
+            {/* Категория и бренд */}
+            <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
+              {product.category && (
+                <Chip
+                  label={product.category}
+                  size="small"
+                  sx={{ textTransform: 'capitalize' }}
+                />
+              )}
+              {product.brand && (
+                <Chip label={product.brand} size="small" variant="outlined" />
+              )}
+            </Box>
+
             <Typography
               variant="h4"
               component="h1"
@@ -93,6 +104,7 @@ export default async function ProductDetailPage({ params }: { params: Params }) 
               {product.title}
             </Typography>
 
+            {/* Рейтинг */}
             {product.rating != null && (
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 3 }}>
                 <Chip
@@ -104,40 +116,71 @@ export default async function ProductDetailPage({ params }: { params: Params }) 
               </Box>
             )}
 
+            {/* Описание */}
+            {product.description && (
+              <Typography variant="body1" color="text.secondary" paragraph sx={{ mb: 3 }}>
+                {product.description}
+              </Typography>
+            )}
+
             <Divider sx={{ my: 3 }} />
 
+            {/* Цена */}
             <Box sx={{ mb: 3 }}>
               <Typography variant="body2" color="text.secondary" gutterBottom>
                 Price
               </Typography>
-              <Typography
-                variant="h3"
-                color="primary.main"
-                sx={{ fontWeight: 700 }}
-              >
+              <Typography variant="h3" color="primary.main" sx={{ fontWeight: 700 }}>
                 ${product.price.toFixed(2)}
               </Typography>
             </Box>
 
+            {/* Наличие */}
+            <Box sx={{ mb: 3 }}>
+              <Typography variant="body2" color="text.secondary" gutterBottom>
+                Availability
+              </Typography>
+              {product.stock > 0 ? (
+                <Chip
+                  label={`${product.stock} in stock`}
+                  color="success"
+                  size="medium"
+                />
+              ) : (
+                <Chip label="Out of stock" color="error" size="medium" />
+              )}
+            </Box>
+
             <Divider sx={{ my: 3 }} />
 
-            <Box>
-              <Typography variant="body2" color="text.secondary" gutterBottom>
-                Product ID
-              </Typography>
-              <Typography
-                variant="body1"
-                sx={{ fontFamily: 'monospace', color: 'text.secondary' }}
-              >
-                {product.id}
-              </Typography>
-            </Box>
-
-            <Box sx={{ mt: 4 }}>
+            {/* Кнопка добавления в корзину */}
+            <Box sx={{ mb: 3 }}>
               <AddToCartButton product={product} />
             </Box>
-          </Box>
-        </Box>
+
+            {/* Информация о доставке */}
+            <Paper
+              elevation={0}
+              sx={{
+                p: 2,
+                backgroundColor: 'grey.50',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 2,
+              }}
+            >
+              <LocalShippingIcon color="primary" sx={{ fontSize: 40 }} />
+              <Box>
+                <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                  Free Shipping
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  On orders over $50
+                </Typography>
+              </Box>
+            </Paper>
+          </Grid>
+        </Grid>
       </Paper>
     </Box>
   );

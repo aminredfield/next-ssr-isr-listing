@@ -7,8 +7,7 @@ import { theme } from '../theme';
 import { CartProvider } from '../context/CartContext';
 
 /**
- * ThemeRegistry - клиентский компонент для интеграции MUI темы в Next.js App Router.
- * Оборачивает приложение в ThemeProvider, CartProvider и применяет CssBaseline.
+ * ThemeRegistry - клиентский компонент для интеграции MUI темы в Next.js App Router
  */
 export function ThemeRegistry({ children }: { children: React.ReactNode }) {
     return (

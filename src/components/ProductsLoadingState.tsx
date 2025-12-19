@@ -5,28 +5,31 @@ import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 
 /**
- * ProductSkeleton - скелетон для карточки товара во время загрузки.
+ * ProductSkeleton - скелетон для карточки товара
  */
 export function ProductSkeleton() {
     return (
         <Card>
             <Skeleton variant="rectangular" height={240} />
             <CardContent>
+                <Skeleton variant="rectangular" width={80} height={24} sx={{ borderRadius: 2, mb: 1 }} />
                 <Skeleton variant="text" height={32} width="80%" />
                 <Skeleton variant="text" height={24} width="60%" sx={{ mt: 1 }} />
-                <Box sx={{ display: 'flex', gap: 1, mt: 2 }}>
+                <Box sx={{ display: 'flex', gap: 1, mt: 2, alignItems: 'center' }}>
                     <Skeleton variant="text" height={32} width={100} />
-                    <Skeleton variant="circular" width={60} height={24} sx={{ ml: 'auto' }} />
+                    <Skeleton variant="rectangular" width={60} height={24} sx={{ ml: 'auto', borderRadius: 2 }} />
                 </Box>
-                <Skeleton variant="rectangular" height={36} sx={{ mt: 2, borderRadius: 1 }} />
+                <Box sx={{ display: 'flex', gap: 1, mt: 2 }}>
+                    <Skeleton variant="rectangular" height={32} sx={{ flex: 1, borderRadius: 1 }} />
+                    <Skeleton variant="rectangular" height={32} sx={{ flex: 1, borderRadius: 1 }} />
+                </Box>
             </CardContent>
         </Card>
     );
 }
 
 /**
- * ProductsLoadingState - состояние загрузки для списка товаров.
- * Показывает 8 скелетонов карточек.
+ * ProductsLoadingState - состояние загрузки для списка товаров
  */
 export function ProductsLoadingState() {
     return (

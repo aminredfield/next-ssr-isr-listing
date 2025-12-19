@@ -4,8 +4,7 @@ import Paper from '@mui/material/Paper';
 import InventoryIcon from '@mui/icons-material/Inventory';
 
 /**
- * EmptyState - компонент для отображения пустого состояния,
- * когда товары не найдены.
+ * EmptyState - компонент для отображения пустого состояния
  */
 export function EmptyState({ message }: { message?: string }) {
   return (
@@ -31,7 +30,7 @@ export function EmptyState({ message }: { message?: string }) {
             fontSize: 80,
             color: 'text.secondary',
             mb: 2,
-            opacity: 0.5
+            opacity: 0.5,
           }}
         />
 
@@ -40,26 +39,9 @@ export function EmptyState({ message }: { message?: string }) {
         </Typography>
 
         {!message && (
-          <>
-            <Typography variant="body1" color="text.secondary" paragraph>
-              There are currently no products available in the catalogue.
-            </Typography>
-
-            <Typography
-              variant="body2"
-              color="text.secondary"
-              sx={{
-                mt: 3,
-                p: 2,
-                backgroundColor: 'background.paper',
-                borderRadius: 1,
-                fontFamily: 'monospace',
-                fontSize: '0.875rem'
-              }}
-            >
-              Try editing <strong>src/data/products.ts</strong> to add some products
-            </Typography>
-          </>
+          <Typography variant="body1" color="text.secondary">
+            There are currently no products available in the catalogue.
+          </Typography>
         )}
       </Paper>
     </Box>

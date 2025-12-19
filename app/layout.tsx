@@ -4,6 +4,8 @@ import { Header } from '../src/components/Header';
 import Container from '@mui/material/Container';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
+import Link from '@mui/material/Link';
+import SocialMediaLinks from '../src/components/SocialMediaLinks';
 
 export const metadata = {
   title: {
@@ -41,12 +43,26 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                 py: 3,
                 px: 2,
                 mt: 'auto',
-                backgroundColor: "grey.100"
+                backgroundColor: 'grey.100',
               }}
             >
               <Container maxWidth="xl">
                 <Typography variant="body2" color="text.secondary" align="center">
-                  Built with Next.js and Material UI
+                  Contacts
+                </Typography>
+                <Box sx={{
+                  display: 'flex',
+                  justifyContent: "center",
+                  py: 2
+                }}>
+
+                  <SocialMediaLinks />
+                </Box>
+                <Typography variant="body2" color="text.secondary" align="center">
+                  Built with Next.js, Material UI, and TypeScript •{' '}
+                  <Link href="https://github.com" color="inherit">
+                    View Source
+                  </Link>
                 </Typography>
               </Container>
             </Box>

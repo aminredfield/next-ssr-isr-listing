@@ -7,7 +7,7 @@ import { useCart } from '../context/CartContext';
 import { useSnackbar } from '../hooks/useSnackbar';
 
 /**
- * AddToCartButton - клиентская кнопка для добавления товара в корзину.
+ * AddToCartButton - клиентская кнопка для добавления товара в корзину
  */
 export function AddToCartButton({ product }: { product: Product }) {
     const { addToCart } = useCart();
@@ -26,9 +26,10 @@ export function AddToCartButton({ product }: { product: Product }) {
                 fullWidth
                 startIcon={<AddShoppingCartIcon />}
                 onClick={handleAddToCart}
+                disabled={product.stock === 0}
                 sx={{ py: 1.5, fontSize: '1.125rem' }}
             >
-                Add to Cart
+                {product.stock === 0 ? 'Out of Stock' : 'Add to Cart'}
             </Button>
             <SnackbarComponent />
         </>

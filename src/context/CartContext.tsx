@@ -90,7 +90,6 @@ export function CartProvider({ children }: { children: ReactNode }) {
         totalPrice: 0,
     });
 
-    // Загрузка корзины из localStorage при монтировании
     useEffect(() => {
         const savedCart = localStorage.getItem(CART_STORAGE_KEY);
         if (savedCart) {
@@ -103,7 +102,6 @@ export function CartProvider({ children }: { children: ReactNode }) {
         }
     }, []);
 
-    // Сохранение корзины в localStorage при изменении
     useEffect(() => {
         localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(state.items));
     }, [state.items]);

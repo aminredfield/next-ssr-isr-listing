@@ -1,31 +1,46 @@
 export interface Product {
   /**
-   * Unique identifier for the product. In a real API this might be a UUID
-   * or database primary key.
+   * Unique identifier for the product
    */
   id: string;
   /**
-   * Human‑readable product name.
+   * Human‑readable product name
    */
   title: string;
   /**
-   * Price in your preferred currency. Here represented as a number for
-   * simplicity.
+   * Price in USD
    */
   price: number;
   /**
-   * Optional numeric rating from customers. A value of null indicates no
-   * rating is available.
+   * Optional numeric rating from customers
    */
   rating: number | null;
   /**
-   * URL to a representative product image. See next/image documentation
-   * for supported formats and remote configuration.
+   * URL to product thumbnail image
    */
   image: string;
   /**
-   * URL‑friendly slug generated from the title. Used when linking to
-   * product pages.
+   * All product images
+   */
+  images: string[];
+  /**
+   * Product description
+   */
+  description: string;
+  /**
+   * Product category
+   */
+  category: string;
+  /**
+   * Product brand
+   */
+  brand: string;
+  /**
+   * Available stock
+   */
+  stock: number;
+  /**
+   * URL‑friendly slug generated from the title
    */
   slug: string;
 }

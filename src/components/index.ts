@@ -5,3 +5,5 @@ export * from './ProductsLoadingState';
 export * from './ThemeRegistry';
 export * from './Header';
 export * from './AddToCartButton';
+export * from './ProductFiltersBar';
+export * from './SocialMediaLinks';

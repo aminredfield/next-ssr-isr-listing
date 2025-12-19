@@ -12,19 +12,19 @@ import Box from '@mui/material/Box';
 import { useCart } from '../context/CartContext';
 
 /**
- * Header - шапка приложения с логотипом и корзиной.
+ * Header - шапка приложения с логотипом и корзиной
  */
 export function Header() {
     const { totalItems } = useCart();
 
     return (
-        <AppBar position="sticky" color="primary" elevation={1}>
+        <AppBar position="sticky" elevation={0} sx={{ bgcolor: 'white', color: 'text.primary' }}>
             <Toolbar>
                 <IconButton
                     component={Link}
                     href="/"
                     edge="start"
-                    color="inherit"
+                    color="primary"
                     aria-label="home"
                     sx={{ mr: 2 }}
                 >
@@ -37,9 +37,9 @@ export function Header() {
                     href="/"
                     sx={{
                         flexGrow: 1,
-                        fontWeight: 600,
+                        fontWeight: 700,
                         textDecoration: 'none',
-                        color: 'inherit',
+                        color: 'primary.main',
                     }}
                 >
                     Product Catalogue
@@ -51,10 +51,11 @@ export function Header() {
                         href="/products"
                         sx={{
                             textDecoration: 'none',
-                            color: 'inherit',
+                            color: 'text.primary',
+                            fontWeight: 500,
                             display: { xs: 'none', sm: 'block' },
                             '&:hover': {
-                                opacity: 0.8,
+                                color: 'primary.main',
                             },
                         }}
                     >
@@ -64,7 +65,7 @@ export function Header() {
                     <IconButton
                         component={Link}
                         href="/cart"
-                        color="inherit"
+                        color="primary"
                         aria-label="shopping cart"
                     >
                         <Badge badgeContent={totalItems} color="error">

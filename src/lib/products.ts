@@ -1,10 +1,10 @@
-import { getProducts } from '../data/products';
 import type { Product } from '../types/product';
+import type { RawProduct, ProductsResponse, CategoriesResponse } from '../data/products';
+
+const API_BASE = 'https://dummyjson.com';
+
 /**
- * Custom error class representing failures during product fetching or
- * normalisation. Throwing this error type from data layer functions
- * allows the UI to differentiate between expected and unexpected
- * failures.
+ * Custom error class representing failures during product fetching
  */
 export class ProductsFetchError extends Error {
   constructor(message: string) {
@@ -14,9 +14,7 @@ export class ProductsFetchError extends Error {
 }
 
 /**
- * Creates a URL‑friendly slug from a given string. Non‑alphanumeric
- * characters are replaced with hyphens and leading/trailing hyphens
- * are removed.
+ * Creates a URL‑friendly slug from a given string
  */
 function slugify(str: string): string {
   return str
@@ -26,40 +24,42 @@ function slugify(str: string): string {
 }
 
 /**
- * Normalises a raw product object returned from an API into a fully typed
- * {@link Product}. Missing optional fields are given sensible
- * defaults. If required fields are missing or of the wrong type a
- * {@link ProductsFetchError} is thrown.
+ * Normalises a raw product object from API into a fully typed Product
  */
-export function normalizeProduct(raw: any): Product {
+export function normalizeProduct(raw: RawProduct): Product {
   if (!raw || typeof raw !== 'object') {
     throw new ProductsFetchError('Invalid product data');
   }
-  const { id, title, price, rating, image, slug } = raw;
+
+  const { id, title, price, rating, thumbnail, images, description, category, brand, stock } = raw;
+
   if (
-    typeof id !== 'string' ||
+    typeof id !== 'number' ||
     typeof title !== 'string' ||
-    typeof price !== 'number' ||
-    typeof image !== 'string'
+    typeof price !== 'number'
   ) {
     throw new ProductsFetchError('Invalid product fields');
   }
+
   return {
-    id,
+    id: String(id),
     title: title.trim(),
     price,
     rating: typeof rating === 'number' ? rating : null,
-    image,
-    slug: typeof slug === 'string' ? slug : slugify(title),
+    image: thumbnail || (images && images[0]) || '',
+    images: images || [thumbnail || ''],
+    description: description || '',
+    category: category || '',
+    brand: brand || '',
+    stock: stock || 0,
+    slug: slugify(title),
   };
 }
 
 /**
- * Normalises an array of raw products. Throws an error if the input
- * value is not an array. Use this function in your data fetching logic
- * to ensure consistent product shapes throughout the app.
+ * Normalises an array of raw products
  */
-export function normalizeProducts(rawProducts: any[]): Product[] {
+export function normalizeProducts(rawProducts: RawProduct[]): Product[] {
   if (!Array.isArray(rawProducts)) {
     throw new ProductsFetchError('Products response is not an array');
   }
@@ -67,39 +67,143 @@ export function normalizeProducts(rawProducts: any[]): Product[] {
 }
 
 /**
- * Fetches and normalises the list of products. In this demo the data
- * comes from a local mock defined in `src/data/products.ts`. Wrapping
- * this in a function allows you to swap out the data source easily
- * without touching the UI code. Errors from normalisation are
- * propagated as {@link ProductsFetchError} to be handled by the
- * framework's error boundary.
+ * Fetches products from DummyJSON API with pagination
  */
-export async function fetchProducts(): Promise<Product[]> {
+export async function fetchProducts(
+  limit: number = 20,
+  skip: number = 0
+): Promise<{ products: Product[]; total: number }> {
   try {
-    const data = getProducts();
-    return normalizeProducts(data);
+    const response = await fetch(
+      `${API_BASE}/products?limit=${limit}&skip=${skip}`,
+      { next: { revalidate: 60 } }
+    );
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data: ProductsResponse = await response.json();
+    const products = normalizeProducts(data.products);
+
+    return {
+      products,
+      total: data.total,
+    };
   } catch (err) {
     if (err instanceof ProductsFetchError) {
       throw err;
     }
+    console.error('Error fetching products:', err);
     throw new ProductsFetchError('Failed to fetch products');
   }
 }
 
 /**
- * Fetches a single product by identifier. Returns null if the
- * product cannot be found. Errors during normalisation are propagated
- * via {@link ProductsFetchError}.
+ * Fetches a single product by ID
  */
 export async function fetchProductById(id: string): Promise<Product | null> {
   try {
-    const data = getProducts();
-    const products = normalizeProducts(data);
-    return products.find((p) => p.id === id) ?? null;
+    const response = await fetch(`${API_BASE}/products/${id}`, {
+      next: { revalidate: 60 },
+    });
+
+    if (!response.ok) {
+      if (response.status === 404) {
+        return null;
+      }
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data: RawProduct = await response.json();
+    return normalizeProduct(data);
   } catch (err) {
     if (err instanceof ProductsFetchError) {
       throw err;
     }
-    throw new ProductsFetchError('Failed to fetch products');
+    console.error('Error fetching product:', err);
+    throw new ProductsFetchError('Failed to fetch product');
+  }
+}
+
+/**
+ * Searches products by query
+ */
+export async function searchProducts(
+  query: string,
+  limit: number = 20
+): Promise<{ products: Product[]; total: number }> {
+  try {
+    const response = await fetch(
+      `${API_BASE}/products/search?q=${encodeURIComponent(query)}&limit=${limit}`,
+      { next: { revalidate: 60 } }
+    );
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data: ProductsResponse = await response.json();
+    const products = normalizeProducts(data.products);
+
+    return {
+      products,
+      total: data.total,
+    };
+  } catch (err) {
+    console.error('Error searching products:', err);
+    throw new ProductsFetchError('Failed to search products');
+  }
+}
+
+/**
+ * Fetches all available categories
+ */
+export async function fetchCategories(): Promise<string[]> {
+  try {
+    const response = await fetch(`${API_BASE}/products/categories`, {
+      next: { revalidate: 3600 }, // Cache for 1 hour
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data: CategoriesResponse = await response.json();
+    return data;
+  } catch (err) {
+    console.error('Error fetching categories:', err);
+    return [];
+  }
+}
+
+/**
+ * Fetches products by category
+ */
+export async function fetchProductsByCategory(
+  category: string,
+  limit: number = 20,
+  skip: number = 0
+): Promise<{ products: Product[]; total: number }> {
+  try {
+    const response = await fetch(
+      `${API_BASE}/products/category/${category}?limit=${limit}&skip=${skip}`,
+      { next: { revalidate: 60 } }
+    );
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data: ProductsResponse = await response.json();
+    const products = normalizeProducts(data.products);
+
+    return {
+      products,
+      total: data.total,
+    };
+  } catch (err) {
+    console.error('Error fetching products by category:', err);
+    throw new ProductsFetchError('Failed to fetch products by category');
   }
 }
