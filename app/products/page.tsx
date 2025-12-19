@@ -9,13 +9,15 @@ import Button from '@mui/material/Button';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import { ProductGrid, EmptyState } from '../../src/components';
 import { ProductFiltersBar } from '../../src/components/ProductFiltersBar';
+import { useProductsAPI } from '../../src/hooks/useProductsAPI';
 import type { Product } from '../../src/types/product';
 import type { ProductFilters } from '../../src/types/filters';
 
-const API_BASE = 'https://dummyjson.com';
 const ITEMS_PER_PAGE = 20;
 
 export default function ProductsPage() {
+  const { fetchProducts, searchProducts, fetchProductsByCategory } = useProductsAPI();
+
   const [products, setProducts] = useState<Product[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
@@ -37,18 +39,11 @@ export default function ProductsPage() {
       setLoading(true);
       setError(null);
 
-      const response = await fetch(
-        `${API_BASE}/products?limit=${ITEMS_PER_PAGE}&skip=0`
-      );
+      const data = await fetchProducts(ITEMS_PER_PAGE, 0);
 
-      if (!response.ok) throw new Error('Failed to fetch products');
-
-      const data = await response.json();
-      const normalized = data.products.map(normalizeProduct);
-
-      setProducts(normalized);
-      setFilteredProducts(normalized);
-      setHasMore(normalized.length < data.total);
+      setProducts(data.products);
+      setFilteredProducts(data.products);
+      setHasMore(data.products.length < data.total);
       setPage(1);
     } catch (err) {
       setError('Failed to load products. Please try again.');
@@ -65,28 +60,21 @@ export default function ProductsPage() {
     try {
       setLoadingMore(true);
 
-      const response = await fetch(
-        `${API_BASE}/products?limit=${ITEMS_PER_PAGE}&skip=${page * ITEMS_PER_PAGE}`
-      );
+      const data = await fetchProducts(ITEMS_PER_PAGE, page * ITEMS_PER_PAGE);
 
-      if (!response.ok) throw new Error('Failed to fetch more products');
-
-      const data = await response.json();
-      const normalized = data.products.map(normalizeProduct);
-
-      setProducts(prev => [...prev, ...normalized]);
+      setProducts(prev => [...prev, ...data.products]);
       setFilteredProducts(prev => {
-        const newFiltered = applyFilters([...prev, ...normalized], filters);
+        const newFiltered = applyFilters([...prev, ...data.products], filters);
         return newFiltered;
       });
-      setHasMore(products.length + normalized.length < data.total);
+      setHasMore(products.length + data.products.length < data.total);
       setPage(prev => prev + 1);
     } catch (err) {
       console.error('Error loading more products:', err);
     } finally {
       setLoadingMore(false);
     }
-  }, [loadingMore, hasMore, page, products.length, filters]);
+  }, [loadingMore, hasMore, page, products.length, filters, fetchProducts]);
 
   // Intersection Observer для бесконечного скролла
   useEffect(() => {
@@ -113,7 +101,6 @@ export default function ProductsPage() {
 
   // Применение фильтров
   const handleFiltersChange = useCallback(async (newFilters: ProductFilters) => {
-    // Проверяем, изменились ли фильтры, чтобы избежать лишних запросов
     const filtersChanged = JSON.stringify(filters) !== JSON.stringify(newFilters);
     if (!filtersChanged) return;
 
@@ -122,19 +109,12 @@ export default function ProductsPage() {
     // Если есть поиск или категория, делаем новый запрос
     if (newFilters.search) {
       try {
-        setLoadingMore(true); // Используем loadingMore вместо loading
+        setLoadingMore(true);
         setError(null);
-        const response = await fetch(
-          `${API_BASE}/products/search?q=${encodeURIComponent(newFilters.search)}`
-        );
-
-        if (!response.ok) throw new Error('Failed to search products');
-
-        const data = await response.json();
-        const normalized = data.products.map(normalizeProduct);
-        const filtered = applyFilters(normalized, newFilters);
+        const data = await searchProducts(newFilters.search);
+        const filtered = applyFilters(data.products, newFilters);
         setFilteredProducts(filtered);
-        setHasMore(false); // Отключаем бесконечный скролл для поиска
+        setHasMore(false);
       } catch (err) {
         console.error(err);
         setError('Failed to search products. Please try again.');
@@ -143,19 +123,12 @@ export default function ProductsPage() {
       }
     } else if (newFilters.category) {
       try {
-        setLoadingMore(true); // Используем loadingMore вместо loading
+        setLoadingMore(true);
         setError(null);
-        const response = await fetch(
-          `${API_BASE}/products/category/${newFilters.category}`
-        );
-
-        if (!response.ok) throw new Error('Failed to fetch category products');
-
-        const data = await response.json();
-        const normalized = data.products.map(normalizeProduct);
-        const filtered = applyFilters(normalized, newFilters);
+        const data = await fetchProductsByCategory(newFilters.category);
+        const filtered = applyFilters(data.products, newFilters);
         setFilteredProducts(filtered);
-        setHasMore(false); // Отключаем бесконечный скролл для категорий
+        setHasMore(false);
       } catch (err) {
         console.error(err);
         setError('Failed to load category products. Please try again.');
@@ -163,12 +136,11 @@ export default function ProductsPage() {
         setLoadingMore(false);
       }
     } else {
-      // Применяем фильтры к загруженным товарам (мгновенно, без loading)
       const filtered = applyFilters(products, newFilters);
       setFilteredProducts(filtered);
-      setHasMore(true); // Включаем бесконечный скролл обратно
+      setHasMore(true);
     }
-  }, [products, filters]);
+  }, [products, filters, searchProducts, fetchProductsByCategory]);
 
   if (loading) {
     return (
@@ -184,15 +156,12 @@ export default function ProductsPage() {
         Products
       </Typography>
 
-      {/* Фильтры - всегда доступны */}
       <ProductFiltersBar onFiltersChange={handleFiltersChange} />
 
-      {/* Счётчик товаров */}
       <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
         {filteredProducts.length} {filteredProducts.length === 1 ? 'product' : 'products'} found
       </Typography>
 
-      {/* Область товаров с loading/error внутри */}
       <Box sx={{ minHeight: '50vh' }}>
         {error ? (
           <Alert
@@ -206,7 +175,6 @@ export default function ProductsPage() {
             {error}
           </Alert>
         ) : loadingMore && filteredProducts.length === 0 ? (
-          // Loading только при первой загрузке с фильтром
           <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
             <CircularProgress size={60} />
           </Box>
@@ -214,7 +182,6 @@ export default function ProductsPage() {
           <>
             <ProductGrid products={filteredProducts} />
 
-            {/* Индикатор загрузки дополнительных товаров */}
             {(hasMore && !filters.search && !filters.category) || loadingMore ? (
               <Box
                 ref={observerTarget}
@@ -236,27 +203,10 @@ export default function ProductsPage() {
   );
 }
 
-// Вспомогательные функции
-function normalizeProduct(raw: any) {
-  return {
-    id: String(raw.id),
-    title: raw.title,
-    price: raw.price,
-    rating: raw.rating || null,
-    image: raw.thumbnail || raw.images?.[0] || '',
-    images: raw.images || [raw.thumbnail],
-    description: raw.description || '',
-    category: raw.category || '',
-    brand: raw.brand || '',
-    stock: raw.stock || 0,
-    slug: raw.title.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
-  };
-}
 
 function applyFilters(products: Product[], filters: ProductFilters): Product[] {
   let result = [...products];
 
-  // Фильтр по цене
   if (filters.minPrice !== undefined) {
     result = result.filter((product) => product.price >= filters.minPrice!);
   }
@@ -264,14 +214,12 @@ function applyFilters(products: Product[], filters: ProductFilters): Product[] {
     result = result.filter((product) => product.price <= filters.maxPrice!);
   }
 
-  // Фильтр по рейтингу
   if (filters.minRating !== undefined && filters.minRating > 0) {
     result = result.filter(
       (product) => product.rating !== null && product.rating >= filters.minRating!
     );
   }
 
-  // Сортировка
   if (filters.sortBy) {
     switch (filters.sortBy) {
       case 'price-asc':

@@ -7,24 +7,21 @@ import Paper from '@mui/material/Paper';
 import Grid from '@mui/material/Grid';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
-import CardMedia from '@mui/material/CardMedia';
-import Container from '@mui/material/Container';
 import StorefrontIcon from '@mui/icons-material/Storefront';
 import LocalShippingIcon from '@mui/icons-material/LocalShipping';
 import VerifiedUserIcon from '@mui/icons-material/VerifiedUser';
 import SupportAgentIcon from '@mui/icons-material/SupportAgent';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import { fetchCategories, fetchProducts } from '../src/lib/products';
 
 // Fetch categories для главной страницы
 async function getCategories() {
   try {
-    const res = await fetch('https://dummyjson.com/products/categories', {
-      next: { revalidate: 3600 },
-    });
-    const data = await res.json();
-    // DummyJSON возвращает массив объектов {slug, name, url}
+    const data = await fetchCategories();
     // Берём первые 8 и извлекаем slug
-    return data.slice(0, 8).map((cat: any) => cat.slug || cat);
+    return data.slice(0, 8).map((cat: any) =>
+      typeof cat === 'string' ? cat : cat.slug || cat
+    );
   } catch {
     return [];
   }
@@ -33,11 +30,8 @@ async function getCategories() {
 // Fetch популярных товаров
 async function getFeaturedProducts() {
   try {
-    const res = await fetch('https://dummyjson.com/products?limit=4', {
-      next: { revalidate: 300 },
-    });
-    const data = await res.json();
-    return data.products;
+    const { products } = await fetchProducts(4, 0);
+    return products;
   } catch {
     return [];
   }
@@ -231,7 +225,6 @@ export default async function HomePage() {
               </Paper>
             ))}
           </Box>
-
         </Box>
       )}
 
@@ -259,7 +252,7 @@ export default async function HomePage() {
           </Box>
 
           <Grid container spacing={3}>
-            {featuredProducts.map((product: any) => (
+            {featuredProducts.map((product) => (
               <Grid item xs={12} sm={6} md={3} key={product.id}>
                 <Card
                   component={Link}
@@ -285,7 +278,7 @@ export default async function HomePage() {
                     }}
                   >
                     <Image
-                      src={product.thumbnail}
+                      src={product.image}
                       alt={product.title}
                       fill
                       style={{ objectFit: 'contain', padding: '16px' }}

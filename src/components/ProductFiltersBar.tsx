@@ -23,6 +23,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import CloseIcon from '@mui/icons-material/Close';
 import type { ProductFilters } from '../types/filters';
 import { SORT_OPTIONS } from '../types/filters';
+import { useProductsAPI } from '../hooks/useProductsAPI';
 
 interface ProductFiltersBarProps {
     onFiltersChange: (filters: ProductFilters) => void;
@@ -33,6 +34,7 @@ export function ProductFiltersBar({ onFiltersChange }: ProductFiltersBarProps) {
     const isMobile = useMediaQuery(theme.breakpoints.down('md'));
     const router = useRouter();
     const searchParams = useSearchParams();
+    const { fetchCategories } = useProductsAPI();
 
     const [drawerOpen, setDrawerOpen] = useState(false);
     const [search, setSearch] = useState(searchParams.get('search') || '');
@@ -51,16 +53,8 @@ export function ProductFiltersBar({ onFiltersChange }: ProductFiltersBarProps) {
 
     // Загрузка категорий
     useEffect(() => {
-        fetch('https://dummyjson.com/products/categories')
-            .then(res => res.json())
-            .then(data => {
-                const categorySlugs = data.map((cat: any) =>
-                    typeof cat === 'string' ? cat : cat.slug || cat.name
-                );
-                setCategories(categorySlugs);
-            })
-            .catch(err => console.error('Error loading categories:', err));
-    }, []);
+        fetchCategories().then(setCategories);
+    }, [fetchCategories]);
 
     // Обновляем URL и вызываем колбэк при изменении фильтров
     useEffect(() => {
@@ -84,7 +78,7 @@ export function ProductFiltersBar({ onFiltersChange }: ProductFiltersBarProps) {
             minRating: minRating > 0 ? minRating : undefined,
             sortBy: sortBy ? (sortBy as ProductFilters['sortBy']) : undefined,
         });
-    }, [search, category, priceRange, minRating, sortBy, router]);
+    }, [search, category, priceRange, minRating, sortBy, router, onFiltersChange]);
 
     const handleReset = () => {
         setSearch('');
@@ -120,6 +114,10 @@ export function ProductFiltersBar({ onFiltersChange }: ProductFiltersBarProps) {
                 <Slider
                     value={priceRange}
                     onChange={(_, newValue) => setPriceRange(newValue as [number, number])}
+                    onChangeCommitted={(_, newValue) => {
+                        // Применяем фильтр только когда пользователь отпустил слайдер
+                        setPriceRange(newValue as [number, number]);
+                    }}
                     valueLabelDisplay="auto"
                     min={0}
                     max={2000}
